@@ -15,7 +15,7 @@ class Timecode_Parser():
         
         elif str(framerate).startswith('23'):
             self.int_framerate = 24
-            self.framerate = 23.98
+            self.framerate = 23.976
 
 
         elif str(framerate).startswith('24'):
