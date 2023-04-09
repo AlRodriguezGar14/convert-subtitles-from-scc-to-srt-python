@@ -1,19 +1,22 @@
 class Timecode_Parser():
-    def __init__(self, timecode, framerate):
+    def __init__(self, timecode, framerate, df=False):
         self.smpte = timecode
         
+        self.drop_frame = df
+
         if len(self.smpte.split(';')) >= 2:
             self.drop_frame = True
-        else:
-            self.drop_frame = False
+
 
         if str(framerate).startswith('29'):
+            #self.drop_frame = True
             self.int_framerate = 30
             self.framerate = 29.97
         
         elif str(framerate).startswith('23'):
             self.int_framerate = 24
             self.framerate = 23.98
+
 
         elif str(framerate).startswith('24'):
             self.int_framerate = 24
@@ -33,7 +36,7 @@ class Timecode_Parser():
 
         # Drop frames is the 6% of the framerate rounded to the nearest number. Confirm this formula
         if self.drop_frame:
-            self.drop_frames = int(round(framerate * 0.666666))
+            self.drop_frames = int(round(self.int_framerate * 0.666666))
         else:
             self.drop_frames = 0
 
@@ -62,7 +65,7 @@ class Timecode_Parser():
             total_minutes = 0
         
         # Check the formula of drop frames calculation
-        total_frames = (((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * self.int_framerate) + int(frames) - (self.drop_frames * (total_minutes - total_minutes // 10))
+        total_frames = (((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * self.int_framerate) + int(frames) + (self.drop_frames * (total_minutes - total_minutes // 10))
 
         return total_frames
     

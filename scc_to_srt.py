@@ -33,7 +33,11 @@ def convert_from_scc_to_srt(file):
     break_added = False
     
     fps = input("Tell me, which is the output framerate?\n")
-
+    
+    drop_frame = False
+    if len(fps.split('-')) >= 2:
+        fps = fps.split('-')[0]
+        drop_frame = True
     match fps:
         case '23' | '23,976' | '23.98':
             fps = '23.98'
@@ -64,7 +68,7 @@ def convert_from_scc_to_srt(file):
         else:
             timecode = cc_line[0]
 
-            converted_tc = Timecode_Parser(timecode, fps)
+            converted_tc = Timecode_Parser(timecode, fps, drop_frame)
             #print(converted_tc)
 
 # Avoid cc_line[1] as it is always the same command as cc_line[2] but repeated
