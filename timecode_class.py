@@ -1,38 +1,21 @@
 class Timecode_Parser():
-    def __init__(self, timecode, framerate, df=False):
+    def __init__(self, timecode: str, framerate: float, df=False):
         self.smpte = timecode
         
         self.drop_frame = df
 
+        # Technically 29.97 should be drop frame, but it's not working that way with the files I tested. Pending to fix or not
         if len(self.smpte.split(';')) >= 2:
             self.drop_frame = True
 
 
-        if str(framerate).startswith('29'):
+        if 29.97 or 23.976 or 24.0 or 25.0 or 30.0:
             #self.drop_frame = True
-            self.int_framerate = 30
-            self.framerate = 29.97
-        
-        elif str(framerate).startswith('23'):
-            self.int_framerate = 24
-            self.framerate = 23.976
-
-
-        elif str(framerate).startswith('24'):
-            self.int_framerate = 24
-            self.framerate = 24.0
-
-        elif str(framerate).startswith('25'):
-            self.int_framerate = 25
-            self.framerate = 25.0
-
-        elif str(framerate).startswith('30'):
-            self.int_framerate = 30
-            self.framerate = 30.0
-
+            self.int_framerate = int(round(framerate))
+            self.framerate = float(framerate)
         else:
-            self.int_framerate = 24
-            self.framerate = 23.98
+            raise ValueError('Invalid framerate')
+        
 
         # Drop frames is the 6% of the framerate rounded to the nearest number. Confirm this formula
         if self.drop_frame:

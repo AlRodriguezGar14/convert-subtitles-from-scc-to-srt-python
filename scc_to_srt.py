@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.10
 
+import argparse
 from timecode_class import Timecode_Parser
 from scc_codes import STANDARD_CHARACTERS, SPECIAL_CHARACTERS, EXTENDED_CHARACTERS
 
@@ -23,7 +24,7 @@ def read_scc(path):
 
 
 
-def convert_from_scc_to_srt(file):
+def convert_from_scc_to_srt(file, fps, drop_frame):
 
     in_timecode = ""
     in_timecode_totals = 0
@@ -32,26 +33,22 @@ def convert_from_scc_to_srt(file):
     line = []
     break_added = False
     
-    fps = input("Tell me, which is the output framerate?\n")
+    #fps = input("Tell me, which is the output framerate?\n")
     
-    drop_frame = False
-    if len(fps.split('-')) >= 2:
-        fps = fps.split('-')[0]
-        drop_frame = True
     match fps:
-        case '23' | '23,976' | '23.98':
-            fps = '23.98'
-        case '25':
-            fps = '25'
-        case '24':
-            fps = '24'
-        case '29' | '29.97':
-            fps = '29.97'
-        case '30':
-            fps = '30'
+        case 23.0 | 23,976 | 23.98:
+            fps = 23.976
+        case 25.0:
+            fps = 25.0
+        case 24.0:
+            fps = 24.0
+        case 29.0 | 29.97:
+            fps = 29.97
+        case 30.0:
+            fps = 30.0
         case _:
-            print('No valid fps introduced. The default is 23.98')
-            fps = '23.98'
+            print('No valid fps introduced. The default is 23.976')
+            fps = 23.976
 
     
     for each_line in file:
@@ -135,25 +132,40 @@ def save_to_srt(captions, position, original_file):
     # Write each caption to the output file
     with open(output, 'a') as f:
         for i in range(position):
-            print(f"{i + 1}\n{captions[f'line{i}']}")
+            #print(f"{i + 1}\n{captions[f'line{i}']}")
             f.write(f'{i+1}\n{captions[f"line{i}"]}\n')
+
+    print(f'Your file {output} has been generated succesfully')
 
 
 
 
 
 if __name__ == '__main__':
+    
+    parser = argparse.ArgumentParser(description="Convert .scc files to .srt")
+    parser.add_argument('path', type=str, help='Path to your .scc file')
+    parser.add_argument('-f', '--fps', type=float, default=23.98, help='Output framerate. Default is 23.98')
+    parser.add_argument('-df', '--drop_frame', action='store_true', help='Add it if you want to drop the frame')
+    args = parser.parse_args()
 
-    path = input('Please, tell me the path to your file...\n')
+
+    #path = input('Please, tell me the path to your file...\n')
 
     # read scc file
-    file = read_scc(path)
+    try:
+        file = read_scc(args.path)
+    except:
+        print('File not found')
+        exit(1)
 
     # convert to srt
-    captions, position = convert_from_scc_to_srt(file)
+    captions, position = convert_from_scc_to_srt(file, args.fps, args.drop_frame)
 
     # save to srt 
-    save_to_srt(captions, position, path)
+    save_to_srt(captions, position, args.path)
+
+    print(args.fps)
 
 
 
