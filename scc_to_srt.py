@@ -10,9 +10,6 @@ from scc_codes import STANDARD_CHARACTERS, SPECIAL_CHARACTERS, EXTENDED_CHARACTE
 # http://www.theneitherworld.com/mcpoodle/SCC_TOOLS/DOCS/SCC_FORMAT.HTML
 
 
-in_command = "94ae"
-out_command = "942c"
-
 # THis is only the concept idea of convertirn scc to srt 
 
 
@@ -32,6 +29,15 @@ def convert_from_scc_to_srt(file, fps, drop_frame):
     captions = {}
     line = []
     break_added = False
+
+    timecode_index = 0
+    text_start_index = 0
+
+
+    in_command = "94ae"
+    out_command = "942c"
+
+
     
     #fps = input("Tell me, which is the output framerate?\n")
     
@@ -52,11 +58,9 @@ def convert_from_scc_to_srt(file, fps, drop_frame):
 
     
     for each_line in file:
-        
         # Skips the empty lines
         if not each_line.strip():
             continue
-        
         cc_line = each_line.split()
         
 
@@ -68,9 +72,11 @@ def convert_from_scc_to_srt(file, fps, drop_frame):
             converted_tc = Timecode_Parser(timecode, fps, drop_frame)
             #print(converted_tc)
 
-# Avoid cc_line[1] as it is always the same command as cc_line[2] but repeated
+        # Avoid cc_line[1] as it is always the same command as cc_line[2] but repeated
         content = cc_line[2::]
 
+
+        # Decode each element of each line
         for i in content:
 
             match i[0:2]:
@@ -86,17 +92,20 @@ def convert_from_scc_to_srt(file, fps, drop_frame):
                         line.insert(0, f'{str(converted_tc).replace(".", ",")} --> ')
                         in_timecode = converted_tc.timecode
                         in_timecode_totals = converted_tc.total_frames
+
                     elif i == out_command:
                         in_tc = in_timecode
                         out_tc = converted_tc.timecode
                         if in_timecode_totals < converted_tc.total_frames:
-                            line[0] = f'{in_tc} --> {out_tc}'
+                            line[timecode_index] = f'{in_tc} --> {out_tc}'
                         else:
-                            line[0] = f'{out_tc} --> {in_tc}'
-                        if '\n' not in line[1]:
-                            line[0] = line[0] + '\n'
+                            line[timecode_index] = f'{out_tc} --> {in_tc}'
+                        if '\n' not in line[text_start_index]:
+                            # Line break to separate the timecode from the content
+                            line[timecode_index] = line[timecode_index] + '\n'
                         
-                        if '♪' in line and line[len(line) -1] != '♪':
+                        # Adds the music ascii to the end if needed (some captions doesn't add it to the end)
+                        if '♪' in line and not line[-1] == '♪':
                             line.append('♪')
                         
                         line.append('\n')
@@ -165,7 +174,6 @@ if __name__ == '__main__':
     # save to srt 
     save_to_srt(captions, position, args.path)
 
-    print(args.fps)
 
 
 

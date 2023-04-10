@@ -1,5 +1,5 @@
 class Timecode_Parser():
-    def __init__(self, timecode: str, framerate: float, df=False):
+    def __init__(self, timecode: str, framerate: float, df:bool =False):
         self.smpte = timecode
         
         self.drop_frame = df
@@ -18,6 +18,8 @@ class Timecode_Parser():
         
 
         # Drop frames is the 6% of the framerate rounded to the nearest number. Confirm this formula
+
+        # Based on this, improve the formula https://www.davidheidelberger.com/2010/06/10/drop-frame-timecode/
         if self.drop_frame:
             self.drop_frames = int(round(self.int_framerate * 0.666666))
         else:
@@ -48,6 +50,7 @@ class Timecode_Parser():
             total_minutes = 0
         
         # Check the formula of drop frames calculation
+        # https://www.davidheidelberger.com/2010/06/10/drop-frame-timecode/
         total_frames = (((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * self.int_framerate) + int(frames) + (self.drop_frames * (total_minutes - total_minutes // 10))
 
         return total_frames

@@ -187,5 +187,7 @@ EXTENDED_CHARACTERS = {
 }
 
 
+in_command = "94ae"
+out_command = "942c"
 
 
