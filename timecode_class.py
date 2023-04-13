@@ -19,9 +19,9 @@ class Timecode_Parser():
 
         # Drop frames is the 6% of the framerate rounded to the nearest number. Confirm this formula
 
-        # Based on this, improve the formula https://www.davidheidelberger.com/2010/06/10/drop-frame-timecode/
-        if self.drop_frame:
-            self.drop_frames = int(round(self.int_framerate * 0.666666))
+        # I get the 0.06666 * framerate to calculate the drop frames from here https://www.davidheidelberger.com/2010/06/10/drop-frame-timecode/
+        if self.drop_frame or len(self.smpte.split(';')) >= 2:
+            self.drop_frames = int(round(self.framerate * 0.0666666))
         else:
             self.drop_frames = 0
 
@@ -49,9 +49,8 @@ class Timecode_Parser():
         except:
             total_minutes = 0
         
-        # Check the formula of drop frames calculation
-        # https://www.davidheidelberger.com/2010/06/10/drop-frame-timecode/
-        total_frames = (((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * self.int_framerate) + int(frames) + (self.drop_frames * (total_minutes - total_minutes // 10))
+
+        total_frames = (((int(hours) * 3600) + (int(minutes) * 60) + int(seconds)) * self.int_framerate) + int(frames) - (self.drop_frames * (total_minutes - (total_minutes // 10)))
 
         return total_frames
     

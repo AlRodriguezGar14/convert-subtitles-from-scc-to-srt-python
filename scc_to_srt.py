@@ -31,7 +31,7 @@ def convert_from_scc_to_srt(file, fps, drop_frame):
     break_added = False
 
     timecode_index = 0
-    text_start_index = 0
+    text_start_index = 1
 
 
     in_command = "94ae"
@@ -100,9 +100,11 @@ def convert_from_scc_to_srt(file, fps, drop_frame):
                             line[timecode_index] = f'{in_tc} --> {out_tc}'
                         else:
                             line[timecode_index] = f'{out_tc} --> {in_tc}'
-                        if '\n' not in line[text_start_index]:
-                            # Line break to separate the timecode from the content
-                            line[timecode_index] = line[timecode_index] + '\n'
+
+                        if line[text_start_index].strip():
+                            print(line[text_start_index])
+                        # Line break to separate the timecode from the content
+                            line[timecode_index] = line[timecode_index].removesuffix('\n') + '\n'
                         
                         # Adds the music ascii to the end if needed (some captions doesn't add it to the end)
                         if '♪' in line and not line[-1] == '♪':
@@ -160,6 +162,8 @@ if __name__ == '__main__':
 
 
     #path = input('Please, tell me the path to your file...\n')
+
+    print(args.path)
 
     # read scc file
     try:
