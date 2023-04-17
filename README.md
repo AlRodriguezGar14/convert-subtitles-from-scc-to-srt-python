@@ -1,7 +1,8 @@
 ## Converts scc subtitles to srt
--> Add the path to the file
--> Define the framerate with -f or --fps (you can use the float or rounded version of framerates)
--> Decide if the timecodes are drop frame or not with -df --drop_frame
+- Add the path to the file
+- Define the framerate with -f or --fps (you can use the float or rounded version of framerates)
+- Decide if the timecodes are drop frame or not with -df --drop_frame
+
 
 #### Note on Drop frames
 The app automatically detects if the timecode is drop frame or ndf based on the *;* or *:* convention, but they occasionally are not correctly provided.
